@@ -28,13 +28,13 @@ resultat = [f"Было проведено проверок ({tests_times})", "Р
 
 
 for x in range(len(programm_input)):
-    test_result = testing(x).strip()
-    the_answer = programm_output[x].strip()
+    test_result = str(testing(x)).strip()
+    the_answer = str(programm_output[x]).strip()
 
     if test_result==the_answer:
-        testing_result = f"Тест {x+1}: \033[32mПравильно ✅\033[0m"
+        testing_result = f"Тест {x+1}: \033[32mПравильно ✅\033[0m (ожидалось: {the_answer}, получили: {test_result})"
     else:
-        testing_result = f"Тест {x+1}: \033[31mНеправильно ❌\033[0m"
+        testing_result = f"Тест {x+1}: \033[31mНеправильно ❌\033[0m (ожидалось: {the_answer}, получили: {test_result})"
     resultat.append(testing_result)
     tests_times+=1
 
