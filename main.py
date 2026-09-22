@@ -1,18 +1,22 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
+import argparse
 import json
 from pathlib import Path
 from subprocess import check_output
 
+parser = argparse.ArgumentParser(description="Тестировщик олимпиадных задач")
+parser.add_argument("olympiad", help="Название папки с олимпиадой")
+args = parser.parse_args()
 number = int(input("Номер задачи "))
 this_folder = Path(__file__).parent.resolve()
-target_script = this_folder / 'tests' / f'{number}.py'
+target_script = this_folder / 'tests' / args.olympiad / f'{number}.py'
 
-with open(this_folder / 'problems' / f'{number}.in', "r", encoding="utf-8") as f:
+with open(this_folder / 'problems' / args.olympiad / f'{number}.in', "r", encoding="utf-8") as f:
      programm_input:list = json.load(f)
 
-with open(this_folder / 'problems' / f'{number}.out', "r", encoding="utf-8") as f:
+with open(this_folder / 'problems' / args.olympiad / f'{number}.out', "r", encoding="utf-8") as f:
      programm_output:list = json.load(f)
 
 def testing(numb:int) -> str:
