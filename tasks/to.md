@@ -1,23 +1,22 @@
 ---
-olympiad: "Testing olympiad"
-stage: "Test"
-year: "2026"
-source_url: "https://codeberg.org/oslot/simpl_tester/src/branch/main/tasks"
-lang: "ru"
+Олимпиада: "Testing olympiad"
+Этап: "Test"
+Год: "2026"
+Изначальный источник: "https://codeberg.org/oslot/simpl_tester/src/branch/main/tasks"
+Язык: "ru"
 ---
 
 ---
 
 # Задача 1
 
-```yaml
-number: "1"
-title: "Тестовая задача"
-time_limit: 1.0
-memory_limit: 10 # В мегабайтах
-stdin: problems/to/1.in
-stdout: problems/to/1.out
-```
+
+@number = 1
+@title = "Тестовая задача"
+@time_limit = 1.0
+@memory_limit = 10 # В мегабайтах
+@stdin = problems/to/1.in
+@stdout = problems/to/1.out
 
 ## Условие
 
