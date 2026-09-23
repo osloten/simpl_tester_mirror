@@ -11,12 +11,12 @@
 ## Задача 1
 
 
-@number = 1\
-@title = "Тестовая задача"\
-@time_limit = 1.0\
-@memory_limit = 10 # В мегабайтах\
-@stdin = problems/to/1.in\
-@stdout = problems/to/1.out\
+meta:number = 1\
+meta:title = "Тестовая задача"\
+meta:time_limit = 1.0\
+meta:memory_limit = 10 # В мегабайтах\
+meta:stdin = problems/to/1.in\
+meta:stdout = problems/to/1.out\
 
 ### Условие
 
