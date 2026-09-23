@@ -3,6 +3,7 @@
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 import argparse
 import json
+import sys
 from pathlib import Path
 from subprocess import check_output
 
@@ -13,8 +14,10 @@ parser.add_argument("olympiad", help="Название папки с олимп�
 args = parser.parse_args()
 number = int(input("Номер задачи "))
 this_folder = Path(__file__).parent.resolve()
-target_script = this_folder / 'tests' / args.olympiad / f'{number}.py'
+target_folder = this_folder / 'tests' / args.olympiad
+existing_extensions = {f.suffix for f in target_folder.glob(f"{number}.*")}
 task_info = parse_file(f"tasks/{args.olympiad}")
+target_script = target_folder / f"{number}.py"
 
 
 with open(this_folder / 'problems' / args.olympiad / f'{number}.in', "r", encoding="utf-8") as f:
@@ -24,7 +27,7 @@ with open(this_folder / 'problems' / args.olympiad / f'{number}.out', "r", encod
      programm_output:list = json.load(f)
 
 
-def testing(numb:int) -> str:
+def testing_py(numb:int, target_script) -> str:
     return check_output(
         ["python", str(target_script)],
         input=str(programm_input[numb]),
@@ -33,12 +36,36 @@ def testing(numb:int) -> str:
     ).strip()
 
 
+def testing_bin(numb:int, target_script) -> str:
+    return check_output(
+        [target_script],
+        input=str(programm_input[numb]),
+        text=True,
+        encoding='utf8'
+    ).strip()
+
+choosen_func = testing_py
+
+if ".py" in existing_extensions:
+    target_script = target_folder / f"{number}.py"
+    choosen_func = testing_py
+elif sys.platform == "win32" and ".exe" in existing_extensions:
+    target_script = target_folder / f"{number}.exe"
+    choosen_func = testing_bin
+elif (sys.platform == "darwin" or sys.platform.startswith("linux")) and "" in existing_extensions:
+    target_script = target_folder / f"{number}"
+    choosen_func = testing_bin
+else:
+    print("Я не вижу подходящих файлов в tests/! Пожалуйста, создайте .py скрипт или скомпилированный файл.")
+    sys.exit(1)
+
 tests_times = 0
 resultat = [f"Было проведено проверок ({tests_times})", "Результаты:"]
 
 
+
 for x in range(len(programm_input)):
-    test_result = str(testing(x)).strip()
+    test_result = str(choosen_func(x, target_script)).strip()
     the_answer = str(programm_output[x]).strip()
 
     if test_result==the_answer:
