@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 from subprocess import check_output
 
-from core.parser import parse_file
+# from core.parser import parse_file
 
 parser = argparse.ArgumentParser(description="Тестировщик олимпиадных задач")
 parser.add_argument("olympiad", help="Название папки с олимпиадой")
@@ -16,7 +16,7 @@ number = int(input("Номер задачи "))
 this_folder = Path(__file__).parent.resolve()
 target_folder = this_folder / 'tests' / args.olympiad
 existing_extensions = {f.suffix for f in target_folder.glob(f"{number}.*")}
-task_info = parse_file(f"tasks/{args.olympiad}")
+# task_info = parse_file(f"tasks/{args.olympiad}")
 target_script = target_folder / f"{number}.py"
 
 
@@ -52,12 +52,14 @@ if ".py" in existing_extensions:
 elif sys.platform == "win32" and ".exe" in existing_extensions:
     target_script = target_folder / f"{number}.exe"
     choosen_func = testing_bin
-elif (sys.platform == "darwin" or sys.platform.startswith("linux")) and "" in existing_extensions:
+elif sys.platform == "darwin" or sys.platform.startswith("linux"):
     target_script = target_folder / f"{number}"
     choosen_func = testing_bin
 else:
     print("Я не вижу подходящих файлов в tests/! Пожалуйста, создайте .py скрипт или скомпилированный файл.")
     sys.exit(1)
+
+
 
 tests_times = 0
 resultat = [f"Было проведено проверок ({tests_times})", "Результаты:"]
