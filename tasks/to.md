@@ -10,7 +10,6 @@
 
 ## Задача 1
 
-
 meta:number = "1"\
 meta:title = "Тестовая задача"\
 meta:time_limit = "1.0"\
