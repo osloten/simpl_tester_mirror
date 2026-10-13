@@ -14,7 +14,12 @@ jobs:
 
       - name: Pack source
         run: |
-          tar --exclude='.git' --exclude='.forgejo' -czf "/tmp/source-${{ forge.ref_name }}.tar.gz" . && mv "/tmp/source-${{ forge.ref_name }}.tar.gz" .
+          mkdir -p dist
+          tar --exclude='.git' --exclude='.forgejo' --exclude='dist' \
+            -czf "dist/source-${{ forge.ref_name }}.tar.gz" .
+          # При желании — сразу и zip
+          zip -rq "dist/source-${{ forge.ref_name }}.zip" . \
+            -x '.git/*' '.forgejo/*' 'dist/*'
 
       - uses: https://data.forgejo.org/actions/forgejo-release@v2
         with:
@@ -23,4 +28,4 @@ jobs:
           repo: ${{ forge.repository }}
           tag: ${{ forge.ref_name }}
           token: ${{ secrets.MY_RUNNER }}
-          release-dir: .
+          release-dir: dist
