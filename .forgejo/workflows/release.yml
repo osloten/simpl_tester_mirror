@@ -14,12 +14,24 @@ jobs:
 
       - name: Pack source
         run: |
-          mkdir -p dist
-          tar --exclude='.git' --exclude='.forgejo' --exclude='dist' \
-            -czf "dist/source-${{ forge.ref_name }}.tar.gz" .
-          # При желании — сразу и zip
-          zip -rq "dist/source-${{ forge.ref_name }}.zip" . \
-            -x '.git/*' '.forgejo/*' 'dist/*'
+                mkdir -p dist
+                tar --exclude='.git' --exclude='.forgejo' --exclude='dist' \
+                  -czf "dist/source-${{ forge.ref_name }}.tar.gz" .
+                python3 - <<'EOF'
+                import os, zipfile
+                tag = os.environ["TAG"]
+                excl_dirs = {".git", ".forgejo", "dist"}
+                with zipfile.ZipFile(f"dist/source-{tag}.zip", "w", zipfile.ZIP_DEFLATED) as z:
+                    for root, dirs, files in os.walk("."):
+                        dirs[:] = [d for d in dirs if d not in excl_dirs]
+                        for f in files:
+                            p = os.path.join(root, f)
+                            if p.startswith("./dist/"):
+                                continue
+                            z.write(p, os.path.relpath(p, "."))
+                EOF
+        env:
+          TAG: ${{ forge.ref_name }}
 
       - uses: https://data.forgejo.org/actions/forgejo-release@v2
         with:
