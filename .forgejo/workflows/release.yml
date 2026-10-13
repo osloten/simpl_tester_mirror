@@ -21,5 +21,5 @@ jobs:
           url: https://codeberg.org
           repo: ${{ forge.repository }}
           tag: ${{ forge.ref_name }}
-          token: ${{ secrets.FORGEJO_TOKEN }}
+          token: ${{ secrets.MY_RUNNER }}
           release-dir: .
