@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: https://data.forgejo.org/actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Pack source
+        run: tar --exclude='.git' --exclude='.forgejo' -czf "source-${{ forge.ref_name }}.tar.gz" .
+
+      - uses: https://data.forgejo.org/actions/forgejo-release@v2
+        with:
+          direction: upload
+          url: https://codeberg.org
+          repo: ${{ forge.repository }}
+          tag: ${{ forge.ref_name }}
+          token: ${{ secrets.FORGEJO_TOKEN }}
+          release-dir: .
