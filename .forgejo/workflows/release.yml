@@ -13,7 +13,8 @@ jobs:
           fetch-depth: 0
 
       - name: Pack source
-        run: tar --exclude='.git' --exclude='.forgejo' -czf "source-${{ forge.ref_name }}.tar.gz" .
+        run: |
+          tar --exclude='.git' --exclude='.forgejo' -czf "/tmp/source-${{ forge.ref_name }}.tar.gz" . && mv "/tmp/source-${{ forge.ref_name }}.tar.gz" .
 
       - uses: https://data.forgejo.org/actions/forgejo-release@v2
         with:
