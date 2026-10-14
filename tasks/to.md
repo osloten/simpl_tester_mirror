@@ -13,7 +13,6 @@
 meta:number = "1"\
 meta:title = "Тестовая задача"\
 meta:time_limit = "1.0"\
-meta:memory_limit = "10"\
 meta:stdin = "problems/to/1.in"\
 meta:stdout = "problems/to/1.out"\
 
@@ -40,7 +39,6 @@ meta:stdout = "problems/to/1.out"\
 meta:number = "2"\
 meta:title = "Квадрат"\
 meta:time_limit = "1.0"\
-meta:memory_limit = "16"\
 meta:stdin = "problems/to/2.in"\
 meta:stdout = "problems/to/2.out"\
 
