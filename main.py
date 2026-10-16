@@ -8,7 +8,7 @@ from pathlib import Path
 from subprocess import check_output
 from time import perf_counter
 
-# from core.parser import parse_file
+from core.parser import parse_file
 
 parser = argparse.ArgumentParser(description="Тестировщик олимпиадных задач")
 parser.add_argument("olympiad", help="Название папки с олимпиадой")
@@ -17,7 +17,7 @@ number = int(input("Номер задачи "))
 this_folder = Path(__file__).parent.resolve()
 target_folder = this_folder / 'tests' / args.olympiad
 existing_extensions = {f.suffix for f in target_folder.glob(f"{number}.*")}
-# task_info = parse_file(f"tasks/{args.olympiad}")
+task_info = parse_file(f"tasks/{args.olympiad}.md")
 target_script = target_folder / f"{number}.py"
 
 with open(this_folder / 'problems' / args.olympiad / f'{number}.in', "r", encoding="utf-8") as f:
@@ -56,7 +56,7 @@ elif sys.platform == "darwin" or sys.platform.startswith("linux"):
     target_script = target_folder / f"{number}"
     choosen_func = testing_bin
 else:
-    print("Я не вижу подходящих файлов в tests/! Пожалуйста, создайте .py скрипт или скомпилированный файл.")
+    print("Я не вижу подходящих файлов в tests! Пожалуйста, создайте .py скрипт или скомпилированный файл.")
     sys.exit(1)
 
 tests_times = 0
@@ -82,11 +82,21 @@ for x in range(len(programm_input)):
     all_time.append(execution_time)
 
 last_time = sum(all_time)/len(all_time)
+
+def test_time(time:float=last_time, info:dict=task_info) -> str:
+    if time<=float(info['time_limit']):
+        right_time_res = f"требовалось: {info['time_limit']} сек. Во времени уложились!"
+    else:
+        right_time_res = f"требовалось: {info['time_limit']} сек. Во времени не уложились, попробуйте оптимизировать!"
+
+    return right_time_res
+
+
 if last_time<1:
     last_time*=1000
-    resultat.append(f"Среднее время выполнения: {last_time:.1f} мс")
+    resultat.append(f"Среднее время выполнения: {last_time:.1f} мс, " + test_time())
 else:
-    resultat.append(f"Среднее время выполнения: {last_time:.2f} сек")
+    resultat.append(f"Среднее время выполнения: {last_time:.2f} сек, " + test_time())
 
 resultat[0] = f"Было проведено проверок {tests_times}"
 
