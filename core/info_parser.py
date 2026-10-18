@@ -20,11 +20,3 @@ def parse_file(path):
 
             meta[key] = val
     return meta
-
-
-def parse_all():
-    result = {}
-    for name in os.listdir(TASKS_DIR):
-        if name.endswith(".md"):
-            result[name] = parse_file(os.path.join(TASKS_DIR, name))
-    return result

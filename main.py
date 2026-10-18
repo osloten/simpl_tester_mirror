@@ -2,13 +2,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 import argparse
-import json
 import sys
 from pathlib import Path
 from subprocess import check_output
 from time import perf_counter
 
-from core.parser import parse_file
+from core.data_parser import parse_data
+from core.info_parser import parse_file
 
 parser = argparse.ArgumentParser(description="Тестировщик олимпиадных задач")
 parser.add_argument("olympiad", help="Название папки с олимпиадой")
@@ -20,17 +20,14 @@ existing_extensions = {f.suffix for f in target_folder.glob(f"{number}.*")}
 task_info = parse_file(f"tasks/{args.olympiad}.md")
 target_script = target_folder / f"{number}.py"
 
-with open(this_folder / 'problems' / args.olympiad / f'{number}.in', "r", encoding="utf-8") as f:
-     programm_input:list = json.load(f)
 
-with open(this_folder / 'problems' / args.olympiad / f'{number}.out', "r", encoding="utf-8") as f:
-     programm_output:list = json.load(f)
-
+programm_input = parse_data(f"{this_folder}/problems/{args.olympiad}/{number}.in")
+programm_output = parse_data(f"{this_folder}/problems/{args.olympiad}/{number}.out")
 
 def testing_py(numb:int, target_script) -> str:
     return check_output(
         ["python", str(target_script)],
-        input=str(programm_input[numb]),
+        input=programm_input[numb]+"\n",
         text=True,
         encoding='utf8'
     ).strip()
@@ -39,7 +36,7 @@ def testing_py(numb:int, target_script) -> str:
 def testing_bin(numb:int, target_script) -> str:
     return check_output(
         [target_script],
-        input=str(programm_input[numb]),
+        input=programm_input[numb]+"\n",
         text=True,
         encoding='utf8'
     ).strip()
@@ -67,13 +64,13 @@ all_time = []
 
 for x in range(len(programm_input)):
     start_time = perf_counter()
-    test_result = str(choosen_func(x, target_script)).strip()
-    the_answer = str(programm_output[x]).strip()
+    test_result = str(choosen_func(x+1, target_script)).strip()
+    the_answer = str(programm_output[x+1]).strip()
 
     if test_result==the_answer:
-        testing_result = f"Тест {x+1}: \033[32mПравильно ✅\033[0m (ожидалось: {the_answer}, получили: {test_result})"
+        testing_result = f"Тест {x+1}: \033[32mПравильно ✅\033[0m (ожидалось: {the_answer.replace('\n', ' ')}, получили: {test_result.replace('\n', ' ')})"
     else:
-        testing_result = f"Тест {x+1}: \033[31mНеправильно ❌\033[0m (ожидалось: {the_answer}, получили: {test_result})"
+        testing_result = f"Тест {x+1}: \033[31mНеправильно ❌\033[0m (ожидалось: {the_answer.replace('\n', ' ')}, получили: {test_result.replace('\n', ' ')})"
     resultat.append(testing_result)
     tests_times+=1
 
