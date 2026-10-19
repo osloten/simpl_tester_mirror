@@ -29,7 +29,8 @@ def testing_py(numb:int, target_script) -> str:
         ["python", str(target_script)],
         input=programm_input[numb]+"\n",
         text=True,
-        encoding='utf8'
+        encoding='utf8',
+        timeout=10.0
     ).strip()
 
 
@@ -38,7 +39,8 @@ def testing_bin(numb:int, target_script) -> str:
         [target_script],
         input=programm_input[numb]+"\n",
         text=True,
-        encoding='utf8'
+        encoding='utf8',
+        timeout=10.0
     ).strip()
 
 choosen_func = testing_py
