@@ -14,7 +14,7 @@ meta:number = "1"\
 meta:title = "Тестовая задача"\
 meta:time_limit = "1.0"\
 meta:stdin = "problems/to/1.in"\
-meta:stdout = "problems/to/1.out"\
+meta:stdout = "problems/to/1.out"
 
 ### Условие
 
@@ -40,7 +40,7 @@ meta:number = "2"\
 meta:title = "Квадрат"\
 meta:time_limit = "1.0"\
 meta:stdin = "problems/to/2.in"\
-meta:stdout = "problems/to/2.out"\
+meta:stdout = "problems/to/2.out"
 
 ### Условие
 
@@ -67,7 +67,7 @@ meta:number = "3"\
 meta:title = "Калькулятор"\
 meta:time_limit = "2.0"\
 meta:stdin = "problems/to/3.in"\
-meta:stdout = "problems/to/3.out"\
+meta:stdout = "problems/to/3.out"
 
 ### Условие
 В лаборатории робототехники юный инженер Петя собирает прототип вычислительной машины. Ему необходимо написать программу, которая будет выполнять базовые операции умножения и сложения для тестирования арифметико-логического устройства (АЛУ). Программа должна принимать на вход два целых числа и выводить их произведение и сумму.
