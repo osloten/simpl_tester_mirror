@@ -20,9 +20,10 @@ existing_extensions = {f.suffix for f in target_folder.glob(f"{number}.*")}
 task_info = parse_file(f"tasks/{args.olympiad}.md")
 target_script = target_folder / f"{number}.py"
 
-
-programm_input = parse_data(f"{this_folder}/problems/{args.olympiad}/{number}.in")
-programm_output = parse_data(f"{this_folder}/problems/{args.olympiad}/{number}.out")
+input_path = Path(this_folder) / task_info.get('stdin', f"problems/{args.olympiad}/{number}.in")
+output_path = Path(this_folder) / task_info.get('stdout', f"problems/{args.olympiad}/{number}.out")
+programm_input = parse_data(str(input_path))
+programm_output = parse_data(str(output_path))
 
 def testing_py(numb:int, target_script) -> str:
     return check_output(
