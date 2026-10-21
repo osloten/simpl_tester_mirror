@@ -17,28 +17,50 @@ number = int(input("Номер задачи "))
 this_folder = Path(__file__).parent.resolve()
 target_folder = this_folder / 'tests' / args.olympiad
 existing_extensions = {f.suffix for f in target_folder.glob(f"{number}.*")}
-task_info = parse_file(f"tasks/{args.olympiad}.md")
-target_script = target_folder / f"{number}.py"
+tasks_info = parse_file(this_folder / 'tasks' / f"{args.olympiad}.md")
+task_info = tasks_info.get(str(number))
+
+if task_info is None:
+    print(f"В tasks/{args.olympiad}.md нет задачи с номером {number}.")
+    sys.exit(1)
 
 input_path = Path(this_folder) / task_info.get('stdin', f"problems/{args.olympiad}/{number}.in")
 output_path = Path(this_folder) / task_info.get('stdout', f"problems/{args.olympiad}/{number}.out")
+
+for path in (input_path, output_path):
+    if not path.is_file():
+        print(f"Не найден файл с тестами: {path}")
+        sys.exit(1)
+
 programm_input = parse_data(str(input_path))
 programm_output = parse_data(str(output_path))
 
-def testing_py(numb:int, target_script) -> str:
+if not programm_input:
+    print(f"Файл с тестами пуст: {input_path}")
+    sys.exit(1)
+
+if len(programm_input) != len(programm_output):
+    print(
+        f"Количество тестов не совпадает: {len(programm_input)} в {input_path.name} "
+        f"и {len(programm_output)} в {output_path.name}."
+    )
+    sys.exit(1)
+
+
+def testing_py(target_script, data: str) -> str:
     return check_output(
         ["python", str(target_script)],
-        input=programm_input[numb]+"\n",
+        input=data + "\n",
         text=True,
         encoding='utf8',
         timeout=10.0
     ).strip()
 
 
-def testing_bin(numb:int, target_script) -> str:
+def testing_bin(target_script, data: str) -> str:
     return check_output(
         [target_script],
-        input=programm_input[numb]+"\n",
+        input=data + "\n",
         text=True,
         encoding='utf8',
         timeout=10.0
@@ -52,51 +74,58 @@ if ".py" in existing_extensions:
 elif sys.platform == "win32" and ".exe" in existing_extensions:
     target_script = target_folder / f"{number}.exe"
     choosen_func = testing_bin
-elif sys.platform == "darwin" or sys.platform.startswith("linux"):
-    target_script = target_folder / f"{number}"
+elif sys.platform.startswith(("linux", "darwin")) and (target_folder / str(number)).is_file():
+    target_script = target_folder / str(number)
     choosen_func = testing_bin
 else:
     print("Я не вижу подходящих файлов в tests! Пожалуйста, создайте .py скрипт или скомпилированный файл.")
     sys.exit(1)
 
 tests_times = 0
-resultat = [f"Было проведено проверок ({tests_times})", "Результаты:"]
+resultat = ["Результаты:"]
 
 all_time = []
 
-
-for x in range(len(programm_input)):
+for test_number in programm_input:
     start_time = perf_counter()
-    test_result = str(choosen_func(x+1, target_script)).strip()
-    the_answer = str(programm_output[x+1]).strip()
+    test_result = str(choosen_func(target_script, programm_input[test_number])).strip()
+    the_answer = str(programm_output[test_number]).strip()
 
-    if test_result==the_answer:
-        testing_result = f"Тест {x+1}: \033[32mПравильно ✅\033[0m (ожидалось: {the_answer.replace('\n', ' ')}, получили: {test_result.replace('\n', ' ')})"
+    answer_display = the_answer.replace("\n", " ")
+    result_display = test_result.replace("\n", " ")
+
+    if test_result == the_answer:
+        testing_result = f"Тест {test_number}: \033[32mПравильно ✅\033[0m (ожидалось: {answer_display}, получили: {result_display})"
     else:
-        testing_result = f"Тест {x+1}: \033[31mНеправильно ❌\033[0m (ожидалось: {the_answer.replace('\n', ' ')}, получили: {test_result.replace('\n', ' ')})"
+        testing_result = f"Тест {test_number}: \033[31mНеправильно ❌\033[0m (ожидалось: {answer_display}, получили: {result_display})"
     resultat.append(testing_result)
-    tests_times+=1
+    tests_times += 1
 
     end_time = perf_counter()
     execution_time = end_time - start_time
     all_time.append(execution_time)
 
-last_time = sum(all_time)/len(all_time)
+last_time = sum(all_time) / len(all_time)
 
-def test_time(time:float=last_time, info:dict=task_info) -> str:
-    if time<=float(info['time_limit']):
-        right_time_res = f"требовалось: {info['time_limit']} сек. Во времени уложились!"
+
+def test_time(time: float, info: dict) -> str:
+    limit = info.get('time_limit')
+
+    if limit is None:
+        return "лимит времени в метаданных не указан."
+
+    if time <= float(limit):
+        right_time_res = f"требовалось: {limit} сек. Во времени уложились!"
     else:
-        right_time_res = f"требовалось: {info['time_limit']} сек. Во времени не уложились, попробуйте оптимизировать!"
+        right_time_res = f"требовалось: {limit} сек. Во времени не уложились, попробуйте оптимизировать!"
 
     return right_time_res
 
 
-if last_time<1:
-    last_time*=1000
-    resultat.append(f"Среднее время выполнения: {last_time:.1f} мс, " + test_time())
+if last_time < 1:
+    resultat.append(f"Среднее время выполнения: {last_time * 1000:.1f} мс, " + test_time(last_time, task_info))
 else:
-    resultat.append(f"Среднее время выполнения: {last_time:.2f} сек, " + test_time())
+    resultat.append(f"Среднее время выполнения: {last_time:.2f} сек, " + test_time(last_time, task_info))
 
 resultat[0] = f"Было проведено проверок {tests_times}"
 
