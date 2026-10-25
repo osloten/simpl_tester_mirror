@@ -8,10 +8,12 @@ from subprocess import check_output
 from time import perf_counter
 
 from core.data_parser import parse_data
+from core.fetch import fetch_olympiads
 from core.info_parser import parse_file
 
 parser = argparse.ArgumentParser(description="Тестировщик олимпиадных задач")
 parser.add_argument("olympiad", help="Название папки с олимпиадой")
+parser.add_argument("--fetch", action="store_true", help="Скачать олимпиады из репозитория (можно без названия олимпиады)")
 args = parser.parse_args()
 number = int(input("Номер задачи "))
 this_folder = Path(__file__).parent.resolve()
@@ -22,6 +24,17 @@ task_info = tasks_info.get(str(number))
 
 if task_info is None:
     print(f"В tasks/{args.olympiad}.md нет задачи с номером {number}.")
+    sys.exit(1)
+
+if args.fetch:
+    rc = fetch_olympiads()
+    if rc != 0:
+        sys.exit(rc)
+    if not args.olympiad:
+        sys.exit(0)
+
+if not args.olympiad:
+    print("Укажите название олимпиады или используйте --fetch.")
     sys.exit(1)
 
 input_path = Path(this_folder) / task_info.get('stdin', f"problems/{args.olympiad}/{number}.in")
